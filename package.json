@@ -1,0 +1,10 @@
+{
+  "name": "nestjs-transaction-management",
+  "version": "0.0.1",
+  "description": "",
+  "author": "Festim Nuredini",
+  "private": true,
+  "devDependencies": {
+    "cypress": "^13.8.1"
+  }
+}
