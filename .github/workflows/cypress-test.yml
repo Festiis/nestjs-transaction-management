@@ -1,0 +1,14 @@
+name: Cypress Tests
+
+on:
+  push:
+    branches:
+      - main # Adjust branch name if needed
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: |
+          echo "Hello World"
