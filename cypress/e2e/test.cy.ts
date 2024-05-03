@@ -1,6 +1,6 @@
-const apiUrl = `${Cypress.env('apiUrl')}`;
+const apiUrl: string = Cypress.env('apiUrl');
 
-function uuid() {
+function uuid(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0,
       v = c == 'x' ? r : (r & 0x3) | 0x8;
@@ -20,8 +20,8 @@ describe('Transaction Management Backend - Level 2', () => {
   });
 
   it('should create a transaction, read it, and fetch the updated account balance', () => {
-    const accountId = uuid();
-    let transactionId;
+    const accountId: string = uuid();
+    let transactionId: string;
     cy.request({
       failOnStatusCode: false,
       method: 'POST',
@@ -49,21 +49,22 @@ describe('Transaction Management Backend - Level 2', () => {
           expect(response.body.amount).to.eq(7);
         });
       })
-      .request({
-        failOnStatusCode: false,
-        method: 'GET',
-        url: `${apiUrl}/accounts/${accountId}`,
-      })
-      .then((response) => {
-        expect(response.status).to.eq(200);
-        expect(response.body.account_id).to.eq(accountId);
-        expect(response.body.balance).to.eq(7);
+      .then(() => {
+        cy.request({
+          failOnStatusCode: false,
+          method: 'GET',
+          url: `${apiUrl}/accounts/${accountId}`,
+        }).then((response) => {
+          expect(response.status).to.eq(200);
+          expect(response.body.account_id).to.eq(accountId);
+          expect(response.body.balance).to.eq(7);
+        });
       });
   });
 
   it('should create transactions with negative amounts', () => {
-    const accountId = uuid();
-    let transactionId;
+    const accountId: string = uuid();
+    let transactionId: string;
 
     cy.request({
       failOnStatusCode: false,
@@ -82,43 +83,45 @@ describe('Transaction Management Backend - Level 2', () => {
         expect(response.body.transaction_id).to.not.be.undefined;
         transactionId = response.body.transaction_id;
       })
-      .request({
-        failOnStatusCode: false,
-        method: 'GET',
-        url: `${apiUrl}/accounts/${accountId}`,
+      .then(() => {
+        cy.request({
+          failOnStatusCode: false,
+          method: 'GET',
+          url: `${apiUrl}/accounts/${accountId}`,
+        }).then((response) => {
+          expect(response.status).to.eq(200);
+          expect(response.body.account_id).to.eq(accountId);
+          expect(response.body.balance).to.eq(4);
+        });
       })
-      .then((response) => {
-        expect(response.status).to.eq(200);
-        expect(response.body.account_id).to.eq(accountId);
-        expect(response.body.balance).to.eq(4);
+      .then(() => {
+        cy.request({
+          failOnStatusCode: false,
+          method: 'POST',
+          url: `${apiUrl}/transactions`,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: {
+            account_id: accountId,
+            amount: -3,
+          },
+        }).then((response) => {
+          expect(response.status).to.eq(201);
+          expect(response.body.transaction_id).to.not.be.undefined;
+          transactionId = response.body.transaction_id;
+        });
       })
-      .request({
-        failOnStatusCode: false,
-        method: 'POST',
-        url: `${apiUrl}/transactions`,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: {
-          account_id: accountId,
-          amount: -3,
-        },
-      })
-      .then((response) => {
-        expect(response.status).to.eq(201);
-        expect(response.body.transaction_id).to.not.be.undefined;
-        transactionId = response.body.transaction_id;
-      })
-      .request({
-        // read account balance
-        failOnStatusCode: false,
-        method: 'GET',
-        url: `${apiUrl}/accounts/${accountId}`,
-      })
-      .then((response) => {
-        expect(response.status).to.eq(200);
-        expect(response.body.account_id).to.eq(accountId);
-        expect(response.body.balance).to.eq(1);
+      .then(() => {
+        cy.request({
+          failOnStatusCode: false,
+          method: 'GET',
+          url: `${apiUrl}/accounts/${accountId}`,
+        }).then((response) => {
+          expect(response.status).to.eq(200);
+          expect(response.body.account_id).to.eq(accountId);
+          expect(response.body.balance).to.eq(1);
+        });
       });
   });
 });
