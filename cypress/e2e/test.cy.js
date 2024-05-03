@@ -1,5 +1,3 @@
-// DO NOT CHANGE THIS FILE!
-
 const apiUrl = `${Cypress.env('apiUrl')}`;
 
 function uuid() {
