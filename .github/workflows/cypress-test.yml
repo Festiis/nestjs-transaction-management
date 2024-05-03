@@ -10,5 +10,58 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: |
-          echo "Hello World"
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Determine config file
+        run: |
+          if [ -f cypress.config.js ]; then
+            echo "config_file=cypress.config.js" >> $GITHUB_ENV
+          else
+            echo "config_file=cypress.config.ts" >> $GITHUB_ENV
+          fi
+
+      - name: Update host
+        run: |
+          sed 's/host.docker.internal/localhost/g' ${{ env.config_file }} > temp && mv temp ${{ env.config_file }}
+
+      - name: Ensure mochawesome
+        run: 'jq -r ".[\"devDependencies\"] |= (.mochawesome = \"^7.1.3\")" package.json > package.json.tmp && mv package.json.tmp package.json'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Fetch apiUrl
+        run: |
+          apiUrl=$(grep "apiUrl:" ${{ env.config_file }} | awk -F": " '{print $2}' | tr -d "'," || echo "")
+
+          # replace double quotes in apiUrl, needed to support cypress.config.js with double quote strings
+          apiUrl="${apiUrl//\"/}"
+          if [[ ! -z "$apiUrl" ]]; then
+            apiUrl="$apiUrl/ping"
+          fi
+
+          echo "apiUrl=$apiUrl" >> $GITHUB_ENV
+
+      - name: Update test reporter
+        run: |
+          sed 's#module.exports = defineConfig({#module.exports = defineConfig({\n  reporter: '\"'mochawesome'\"',\n  reporterOptions: {\n    reportDir: '\"'cypress/reports/mocha'\"',\n    quiet: true,\n    overwrite: false,\n    html: false,\n    json: true\n  },#g' ${{ env.config_file }} > temp_js
+          sed 's#export default defineConfig({#export default defineConfig({\n  reporter: '\"'mochawesome'\"',\n  reporterOptions: {\n    reportDir: '\"'cypress/reports/mocha'\"',\n    quiet: true,\n    overwrite: false,\n    html: false,\n    json: true\n  },#g' temp_js > temp
+          mv temp ${{ env.config_file }}
+
+      # Running tests for all challenges except Backend.
+      - name: Run tests without waiting on API
+        if: env.apiUrl == ''
+        uses: cypress-io/github-action@v5
+        with:
+          build: npm run build
+          start: npm run start
+
+      # Running tests for Backend challenges. Waiting on API is required.
+      - name: Run tests with waiting on API
+        if: env.apiUrl != ''
+        uses: cypress-io/github-action@v5
+        with:
+          build: npm run build
+          start: npm run start
+          wait-on: ${{ env.apiUrl }}
