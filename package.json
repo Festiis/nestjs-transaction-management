@@ -5,8 +5,7 @@
   "author": "Festim Nuredini",
   "private": true,
   "scripts": {
-    "cy:test": "cypress run",
-    "cy:open": "cypress open"
+    "cy:test": "cypress run"
   },
   "devDependencies": {
     "cypress": "^13.8.1"

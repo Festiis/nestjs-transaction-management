@@ -1,35 +1,35 @@
 // DO NOT CHANGE THIS FILE!
 
-const apiUrl = `${Cypress.env("apiUrl")}`;
+const apiUrl = `${Cypress.env('apiUrl')}`;
 
 function uuid() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0,
-      v = c == "x" ? r : (r & 0x3) | 0x8;
+      v = c == 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
 
-describe("Transaction Management Backend - Level 2", () => {
-  it("Provides a functional healthcheck", () => {
+describe('Transaction Management Backend - Level 2', () => {
+  it('Provides a functional healthcheck', () => {
     cy.request({
       failOnStatusCode: false,
-      method: "GET",
+      method: 'GET',
       url: `${apiUrl}/ping`,
     }).then((response) => {
       expect(response.status).to.eq(200);
     });
   });
 
-  it("should create a transaction, read it, and fetch the updated account balance", () => {
+  it('should create a transaction, read it, and fetch the updated account balance', () => {
     const accountId = uuid();
     let transactionId;
     cy.request({
       failOnStatusCode: false,
-      method: "POST",
+      method: 'POST',
       url: `${apiUrl}/transactions`,
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: {
         account_id: accountId,
@@ -42,7 +42,7 @@ describe("Transaction Management Backend - Level 2", () => {
         transactionId = response.body.transaction_id;
         cy.request({
           failOnStatusCode: false,
-          method: "GET",
+          method: 'GET',
           url: `${apiUrl}/transactions/${transactionId}`,
         }).then((response) => {
           expect(response.status).to.eq(200);
@@ -53,7 +53,7 @@ describe("Transaction Management Backend - Level 2", () => {
       })
       .request({
         failOnStatusCode: false,
-        method: "GET",
+        method: 'GET',
         url: `${apiUrl}/accounts/${accountId}`,
       })
       .then((response) => {
@@ -63,16 +63,16 @@ describe("Transaction Management Backend - Level 2", () => {
       });
   });
 
-  it("should create transactions with negative amounts", () => {
+  it('should create transactions with negative amounts', () => {
     const accountId = uuid();
     let transactionId;
 
     cy.request({
       failOnStatusCode: false,
-      method: "POST",
+      method: 'POST',
       url: `${apiUrl}/transactions`,
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: {
         account_id: accountId,
@@ -86,7 +86,7 @@ describe("Transaction Management Backend - Level 2", () => {
       })
       .request({
         failOnStatusCode: false,
-        method: "GET",
+        method: 'GET',
         url: `${apiUrl}/accounts/${accountId}`,
       })
       .then((response) => {
@@ -96,10 +96,10 @@ describe("Transaction Management Backend - Level 2", () => {
       })
       .request({
         failOnStatusCode: false,
-        method: "POST",
+        method: 'POST',
         url: `${apiUrl}/transactions`,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: {
           account_id: accountId,
@@ -114,7 +114,7 @@ describe("Transaction Management Backend - Level 2", () => {
       .request({
         // read account balance
         failOnStatusCode: false,
-        method: "GET",
+        method: 'GET',
         url: `${apiUrl}/accounts/${accountId}`,
       })
       .then((response) => {
