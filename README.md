@@ -1,24 +1,35 @@
 # NestJS Transaction Management
 
-This repository contains a demonstration API built with Nest.js showcasing transaction management.
+A small NestJS API built to explore transaction handling without turning the codebase into a mess.
 
-## Features
+## Stack
 
-- 🛠️ **Built with Nest.js**: Utilizes the powerful Nest.js framework.
-- 🔄 **Transaction Management**: Demonstrates transaction management using Nest.js and TypeORM.
-- 📝 **API Documentation**: API documentation is generated using Swagger with `@nestjs/swagger`.
-- 🔄 **ORM Integration**: Integrates TypeORM for seamless database operations.
-- 📋 **Validation**: Implements class-validator and class-transformer for request validation.
-- 📦 **Dependency Injection**: Utilizes the dependency injection system provided by Nest.js for modularity.
-- 📦 **SQLite Database**: Uses SQLite as the database.
-- ⚙️ **Automated Testing**: Automated tests using Cypress with GitHub Actions.
+- NestJS / TypeScript
+- TypeORM
+- SQLite
+- Swagger / OpenAPI
+- class-validator / class-transformer
+- Dependency injection
+- Cypress
+- GitHub Actions
 
-## Getting Started
+## What this is about
 
-To get started, clone the repository and install dependencies:
+The interesting part here is transaction management: keeping related database operations atomic while still keeping the service layer readable and testable.
+
+It also gave me an excuse to work with the parts of NestJS I like most — modules, dependency injection and a fairly opinionated application structure.
+
+## Run
 
 ```bash
-git clone https://github.com/your-username/nestjs-transaction-management.git
+git clone https://github.com/Festiis/nestjs-transaction-management.git
 cd nestjs-transaction-management
 npm install
+npm run start:dev
+```
+
+## Tests
+
+```bash
+npm run cy:test
 ```
